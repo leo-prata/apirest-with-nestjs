@@ -1,18 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { PostService } from './posts.service';
-
-interface PostRequest {
-	title: string;
-	content: string;
-}
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('posts')
 export class PostController {
 	constructor(private readonly postService: PostService) {}
 
 	@Post()
-	async createPost(@Body() { title, content }: PostRequest) {
-		const post = await this.postService.createPost({ title, content });
+	async createPost(@Body() postDto: CreatePostDto) {
+		const post = await this.postService.createPost(postDto);
 		return post;
 	}
 
@@ -20,5 +17,10 @@ export class PostController {
 	async listPosts() {
 		const posts = await this.postService.listPosts();
 		return posts;
+	}
+
+	@Patch(':id')
+	async updatePost(@Param('id') id: string, @Body() postDto: UpdatePostDto) {
+		return this.postService.updatePost(Number(id), postDto);
 	}
 }
