@@ -36,6 +36,12 @@ export default tseslint.config(
 					endOfLine: 'auto',
 				},
 			],
+			'@typescript-eslint/no-unsafe-call': [
+				'error',
+				{
+					ignore: ['class-validator'],
+				},
+			],
 		},
 	}
 );
