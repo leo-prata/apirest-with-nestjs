@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 
 interface PostRequest {
 	title: string;
@@ -15,13 +16,8 @@ interface PostRequest {
 export class PostService {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async createPost({ title, content }: PostRequest) {
-		const post = await this.prisma.post.create({
-			data: {
-				title,
-				content,
-			},
-		});
+	async createPost(createPostDto: CreatePostDto) {
+		const post = await this.prisma.post.create({ data: createPostDto });
 		return post;
 	}
 
