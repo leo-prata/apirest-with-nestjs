@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+	Injectable,
+	InternalServerErrorException,
+	NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePostDto } from './dto/update-post.dto';
 
@@ -32,16 +36,29 @@ export class PostService {
 		return posts;
 	}
 
-	async updatePost(id: number, postDto: UpdatePostDto) {
-		const post = await this.prisma.post.update({
-			where: {
-				id,
-			},
-			data: {
-				...postDto,
-				updatedAt: new Date(),
-			},
-		});
-		return post;
+	async updatePost(id: number, updatePostDto: UpdatePostDto) {
+		try {
+			const postExists = await this.prisma.post.findUnique({
+				where: { id },
+			});
+
+			if (!postExists) {
+				throw new NotFoundException('Post not found');
+			}
+
+			const post = await this.prisma.post.update({
+				where: { id },
+				data: {
+					...updatePostDto,
+				},
+			});
+
+			return post;
+		} catch (error) {
+			if (error instanceof NotFoundException) {
+				throw error;
+			}
+			throw new InternalServerErrorException('Internal server error');
+		}
 	}
 }
